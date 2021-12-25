@@ -1,3 +1,4 @@
+import random
 board_cols = 7
 board_rows = 6
 player_o = "o"
@@ -25,6 +26,18 @@ def is_full(boar, col):
         if boar[i][col] == "-":
             oke = True
     if oke:
+        return False
+    else:
+        return True
+
+
+def completely_full(boar):
+    um = True
+    for i in range(board_rows):
+        for j in range(board_cols):
+            if boar[i][j] == "-":
+                um = False
+    if not um:
         return False
     else:
         return True
@@ -69,15 +82,87 @@ def check_if_won(boar, active):
         return False
 
 
+def comp_move(boar, player):
+    best_score = -1000
+    best_move = 0
+    for i in range(board_cols):
+        for j in range(board_rows):
+            if boar[5][i] == "-":
+                boar[5][i] = player
+                score = minimax(boar, False, 1)
+                boar[5][i] = "-"
+                if score > best_score:
+                    best_score = score
+                    best_move = i
+
+            elif boar[j][i] != "-" and not is_full(boar, i):
+                boar[j - 1][i] = player
+                score = minimax(boar, False, 1)
+                boar[j - 1][i] = "-"
+                if score > best_score:
+                    best_score = score
+                    best_move = i
+
+    mark(boar, best_move, player_o)
+
+
+def minimax(boar, is_max, depth):
+
+    if check_if_won(boar, player_o):
+        return 100
+    elif check_if_won(boar, player_x):
+        return -100
+    elif completely_full(boar):
+        return 0
+
+    if is_max:
+        best_score = -1000
+        for i in range(board_cols):
+            for j in range(board_rows):
+                if boar[5][i] == "-":
+                    boar[5][i] = player_o
+                    score = minimax(boar, False, depth + 1)
+                    boar[5][i] = "-"
+                    if score > best_score:
+                        best_score = score
+                elif boar[j][i] != "-" and not is_full(boar, i):
+                    boar[j - 1][i] = player_o
+                    score = minimax(boar, False, depth + 1)
+                    boar[j - 1][i] = "-"
+                    if score > best_score:
+                        best_score = score
+        return best_score
+
+    else:
+        best_score = 1000
+        for i in range(board_cols):
+            for j in range(board_rows):
+                if boar[5][i] == "-":
+                    boar[5][i] = player_x
+                    score = minimax(boar, True, depth + 1)
+                    boar[5][i] = "-"
+                    if score < best_score:
+                        best_score = score
+                elif boar[j][i] != "-" and not is_full(boar, i):
+                    boar[j - 1][i] = player_x
+                    score = minimax(boar, True, depth + 1)
+                    boar[j - 1][i] = "-"
+                    if score < best_score:
+                        best_score = score
+        return best_score
+
+
 def main():
     active = player_x
     while True:
         if active == player_x:
+            mark(board, int(input("Enter a column [1-7]: ")) - 1, player_x)
+            print_board(board)
             active = player_o
-            pass
         elif active == player_o:
+            comp_move(board, player_o)
+            print_board(board)
             active = player_x
-            pass
 
 
 if __name__ == '__main__':
