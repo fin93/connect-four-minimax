@@ -113,7 +113,7 @@ def comp_move(boar, player):
 
 
 def minimax(boar, is_max, depth):
-    while depth < 4:
+    if depth < 4:
         if has_won(boar, player_o):
             return 1000
         elif has_won(boar, player_x):
